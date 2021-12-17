@@ -1,0 +1,54 @@
+{"bodyparts":[
+    {"name":"Neck","href":"https://exrx.net/Lists/ExList/NeckWt","muscles":[
+        {"name":"Sternocleidomastoid"},
+        {"name":"Splenius"}
+        ]},
+    {"name":"Shoulders","href":"https://exrx.net/Lists/ExList/ShouldWt","muscles":[
+        {"name":"Deltoid"},
+        {"name":"Deltoid - Anterior"},
+        {"name":"Deltoid - Lateral"},
+        {"name":"Deltoid - Posterior"},{"name":"Supraspinatus"}
+        ]},
+    {"name":"Upper Arms","href":"https://exrx.net/Lists/ExList/ArmWt","muscles":[
+        {"name":"Triceps Brachii"},
+        {"name":"Biceps Brachii"},
+        {"name":"Brachialis"}
+        ]},
+    {"name":"Forearms","href":"https://exrx.net/Lists/ExList/ForeArmWt","muscles":[
+        {"name":"Brachioradialis"},
+        {"name":"Wrist"},
+        {"name":"Wrist - Flexors"},
+        {"name":"Wrist - Extensors"},
+        {"name":"Pronators"},
+        {"name":"Supinators"}
+        ]},
+    {"name":"Back","href":"https://exrx.net/Lists/ExList/BackWt","muscles":[
+        {"name":"General"},
+        {"name":"Latissimus Dorsi & Teres Major"},
+        {"name":"Trapezius"},
+        {"name":"Trapezius - Upper"},
+        {"name":"Trapezius - Middle"},
+        {"name":"Trapezius - Lower"},
+        {"name":"Levator Scapulae"},
+        {"name":"Rhomboids"},
+        {"name":"Infraspinatus & Teres Minor"},
+        {"name":"Subscapularis"}]},
+    {"name":"Chest","href":"https://exrx.net/Lists/ExList/ChestWt","muscles":[
+        {"name":"General"},
+        {"name":"Pectoralis Major"},
+        {"name":"Pectoralis Major - Sternal"},
+        {"name":"Pectoralis Major - Clavicular"},
+        {"name":"Pectoralis Minor"},
+        {"name":"Serratus Anterior"}]},
+    {"name":"Waist","href":"https://exrx.net/Lists/ExList/WaistWt","muscles":[
+        {"name":"Rectus Abdominis"},
+        {"name":"Transverse Abdominis"},
+        {"name":"Obliques"},
+        {"name":"Quadratus Lumborum"},
+        {"name":"Erector Spinae"}]},
+    {"name":"Hips","href":"https://exrx.net/Lists/ExList/HipsWt","muscles":[
+            {"name":"Gluteus Maximus"},
+            {"name":"Abductors"},
+            {"name":"Wrist - Flexors"},
+            {"name":"Deep External Rotators"}]},
+    {"name":"Thighs","href":"https://exrx.net/Lists/ExList/ThighWt","muscles":[{"name":"Quadriceps"},{"name":"Hamstrings"},{"name":"Hip Adductors"}]},{"name":"Calves","href":"https://exrx.net/Lists/ExList/CalfWt","muscles":[{"name":"General"},{"name":"Gastrocnemius"},{"name":"Soleus"},{"name":"Tibialis Anterior"},{"name":"Popliteus"}]}]}
