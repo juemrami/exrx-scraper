@@ -1,7 +1,9 @@
 # exrx-scraper
-This is a scraper for the exercises directory of Exrx.net, made using puppeteer because the exrx api is not free to use. 
+This is a scraper for the exercises directory of Exrx.net.
+It is made using puppeteer(a headless chromium browser) ontop of javascript. 
 
-The original that this was forked from was incomplete, this is my work on completeting it.
+## about
+The original that this was forked from was incomplete (would not pull deeper than the name of the muscle groups), this is my work on completeting it.
 
 - Run using `node index`
 - This will create a json with exercises of Exrx.net
