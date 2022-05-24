@@ -14,7 +14,11 @@ const puppeteer = require('puppeteer');
             let exVariant = []
             siteDivContent.forEach( container => {
                 debugger;
-                //4 layers 1-2-3-4, 1 being the extype  2 is exname 3 is exvariant and 4 is a variant-variant
+                //4 layers 1-2-3-4, 
+                // 1 being the ex type  
+                // 2 is ex name 
+                // 3 is ex variant 
+                // 4 is a variant-variant
                 if (container.querySelector(".col-sm-6")){
                     const mole = container.querySelectorAll(".col-sm-6 > ul > li")
                     const layer = 1

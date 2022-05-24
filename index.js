@@ -3,6 +3,7 @@
 // INside of supraspinatis in shoulders. theres a weird edge case to fix with a blank #text element
 
 const puppeteer = require("puppeteer");
+// import Date
 const fs = require("fs");
 (async () => {
   const finalData = [];
@@ -10,85 +11,34 @@ const fs = require("fs");
     const browser = await puppeteer.launch({
       headless: false,
       devtools: true,
-      debuggingPort: 5500,
+      slowMo: 50,
     });
     const page = await browser.newPage();
 
     await page.goto("https://exrx.net/Lists/Directory", {
       waitUntil: "domcontentloaded",
     });
-
-    const musclesInMuscleGroup = {};
-    const finalArr = [];
-    const finalMap = new Map();
-
+    // create an object for each of the major muscle groups on the site
+    // object includes name, href, and an object.
     const muscleGroups = await page.evaluate(() => {
-      const groupMuscles = (muscle) => {
-        let name = "";
-        switch (muscle) {
-          case "Anterior":
-            name = "Deltoid - Anterior";
-            break;
-          case "Lateral":
-            name = "Deltoid - Lateral";
-            break;
-          case "Posterior":
-            name = "Deltoid - Posterior";
-            break;
-          case "Flexors":
-            name = "Wrist - Flexors";
-            break;
-          case "Extensors":
-            name = "Wrist - Extensors";
-            break;
-          case "Upper":
-            name = "Trapezius - Upper";
-            break;
-          case "Middle":
-            name = "Trapezius - Middle";
-            break;
-          case "Lower":
-            name = "Trapezius - Lower";
-            break;
-          case "Sternal":
-            name = "Pectoralis Major - Sternal";
-            break;
-          case "Clavicular":
-            name = "Pectoralis Major - Clavicular";
-            break;
-          default:
-            name = muscle;
-            break;
-        }
-        return name;
-      };
-      const bodyPartsElements = document.querySelectorAll(
+      const muscleGroupDomElements = document.querySelectorAll(
         ".col-sm-6 > ul > li > a"
       );
 
-      const musclesElements = document.querySelectorAll(".col-sm-6 > ul > li");
+      const subMuscleDomElements = document.querySelectorAll(
+        ".col-sm-6 > ul > li"
+      );
 
       const data = [];
-      for (let i = 0; i < bodyPartsElements.length; i++) {
-        // muscles
-        let muscleArray = musclesElements[i].innerText.split("\n");
+      for (let i = 0; i < muscleGroupDomElements.length; i++) {
+        let muscleArray = subMuscleDomElements[i].innerText.split("\n");
+
         // remove first entry as it repeats the name itself
         muscleArray.shift();
-        let muscleObjects = [];
-        muscleArray.forEach((element) => {
-          // non-clickable areas
-          if (
-            element !== "Deltoid" ||
-            "Wrist" ||
-            "Trapezius" ||
-            "Pectoralis Major"
-          ) {
-            muscleObjects.push({ name: groupMuscles(element) });
-          }
-        });
+
         data.push({
-          name: bodyPartsElements[i].innerText,
-          href: bodyPartsElements[i].href,
+          name: muscleGroupDomElements[i].innerText,
+          href: muscleGroupDomElements[i].href,
           muscles: new Object(),
         });
       }
@@ -98,7 +48,7 @@ const fs = require("fs");
       // document.querySelector() grabs a single element == await page.$
       // document.querySelectorAll() grabs many elements == await page.$$
       //await page.waitForSelector('.article')
-      // using .article becase that is the name of the CSS container in exrx website
+      // using .article because that is the name of the CSS container in exrx website
       /*
                     To select using id — use ‘#’ and append id of the parent element.
                     To select using class —use ‘.’ and append class of the parent element. 
@@ -107,19 +57,19 @@ const fs = require("fs");
     for (let i = 0; i < muscleGroups.length; i++) {
       await page.goto(muscleGroups[i].href, { waitUntil: "domcontentloaded" });
       let muscleGroupData = await page.evaluate(() => {
-        const siteDivContent = document.querySelectorAll(
+        const muscleContainers = document.querySelectorAll(
           "#mainShell > article > .container > .row > .col-sm-12"
         );
         let Muscles = [];
         const MuscleMap = new Map();
-        siteDivContent.forEach((container, index) => {
+        muscleContainers.forEach((container, index) => {
           let excerciseTypeMap = new Map();
+
           if (container.querySelector(".col-sm-6")) {
             console.log(container);
-            const exerciseTypes = container.querySelectorAll(
-              ".col-sm-6 > ul > li"
-            );
-            exerciseTypes.forEach((li) => {
+            const exerciseEquipmentVariantContainer =
+              container.querySelectorAll(".col-sm-6 > ul > li");
+            exerciseEquipmentVariantContainer.forEach((li) => {
               const li_children = li.childNodes;
               let textValueIndex = -1;
               do {
@@ -135,7 +85,7 @@ const fs = require("fs");
                 listStartIndex
               ].querySelectorAll(".col-sm-6 > ul > li > ul > li");
               exNamesContainer.forEach((e) => {
-                //Check if varriant even it exists
+                //Check if variant even exists
                 //Currently Not supported WIP
 
                 // THIS IS JUST HERE BECAUSE EXRX FRONTEND DEVS ARE INCONSITENT
@@ -153,7 +103,10 @@ const fs = require("fs");
                   console.log(e.childNodes[listStartIndex]);
                   // const exVariantContainer = e.childNodes[listStartIndex].querySelectorAll('li')
                 }
-
+                console.log({
+                  name: e.childNodes[0].textContent,
+                  href: cycleChildrenForHref(e) || null,
+                });
                 excNames.push({
                   name: e.childNodes[0].textContent,
                   href: cycleChildrenForHref(e) || null,
@@ -195,25 +148,30 @@ const fs = require("fs");
           console.log(res);
           return res;
         }
-        debugger;
+        // debugger;
         console.log(MuscleMap);
         return stringifyMap(MuscleMap);
       });
-      debugger;
+      // debugger;
       muscleGroups[i].muscles = muscleGroupData;
       console.log(muscleGroups[i].name + " is okay");
       finalData.push(muscleGroups[i]);
     }
   } catch (e) {
     var jsonContent = JSON.stringify(finalData);
-    fs.writeFile("output_succesfull.json", jsonContent, "utf8", function (err) {
-      if (err) {
-        console.log("An error occured while writing JSON Object to File.");
-        return console.log(err);
-      }
+    fs.appendFile(
+      `output-${new Date().toISOString()}.json`,
+      jsonContent,
+      "utf8",
+      function (err) {
+        if (err) {
+          console.log("An error occured while writing JSON Object to File.");
+          return console.log(err);
+        }
 
-      console.log("JSON file has been saved.");
-    });
+        console.log("JSON file has been saved.");
+      }
+    );
     console.log("our err", e);
   }
 })();
