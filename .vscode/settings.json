@@ -12,5 +12,6 @@
     "**/.settings": true,
     "**/.factorypath": true
   },
-  "hide-files.files": ["test.js"]
+  "hide-files.files": ["test.js"],
+  "cSpell.words": ["Exrx", "Popliteus", "Supraspinatus"]
 }
