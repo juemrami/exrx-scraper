@@ -2,16 +2,17 @@
 // Inside of shoulders. seems like were picking up 1 too many headers. should only have 8 and have 9
 // INside of supraspinatis in shoulders. theres a weird edge case to fix with a blank #text element
 
-const puppeteer = require("puppeteer");
+import * as puppeteer from "puppeteer";
+import * as fs from "fs";
 // import Date
-const fs = require("fs");
+
 (async () => {
   const finalData = [];
   try {
     const browser = await puppeteer.launch({
       headless: false,
       devtools: true,
-      // slowMo: 50,
+      slowMo: 50,
     });
     const page = await browser.newPage();
 
@@ -31,14 +32,15 @@ const fs = require("fs");
 
       const data = [];
       for (let i = 0; i < muscleGroupDomElements.length; i++) {
-        let muscleArray = subMuscleDomElements[i].innerText.split("\n");
+        const element = subMuscleDomElements[i] as HTMLAnchorElement;
+        let muscleArray = element.innerText.split("\n");
 
         // remove first entry as it repeats the name itself
         muscleArray.shift();
 
         data.push({
-          name: muscleGroupDomElements[i].innerText,
-          href: muscleGroupDomElements[i].href,
+          name: element.innerText,
+          href: element.href,
           muscles: new Object(),
         });
       }
@@ -50,11 +52,12 @@ const fs = require("fs");
       //await page.waitForSelector('.article')
       // using .article because that is the name of the CSS container in exrx website
       /*
-                    To select using id — use ‘#’ and append id of the parent element.
-                    To select using class —use ‘.’ and append class of the parent element. 
-                    */
+      To select using id — use ‘#’ and append id of the parent element.
+      To select using class —use ‘.’ and append class of the parent element. 
+      */
     }
     for (let i = 0; i < muscleGroups.length; i++) {
+      //../ExList/..
       await page.goto(muscleGroups[i].href, { waitUntil: "domcontentloaded" });
       let muscleGroupData = await page.evaluate(() => {
         const muscleContainers = document.querySelectorAll(
@@ -62,25 +65,27 @@ const fs = require("fs");
         );
         let Muscles = [];
         const MuscleMap = new Map();
+
+        // iterate each important container in the page
         muscleContainers.forEach((container, index) => {
-          let excerciseTypeMap = new Map();
+          let exerciseTypeMap = new Map();
+          // check if container has a child element of <h2> or <ul>
+          const elementChildren = container.childNodes;
 
           if (container.querySelector(".col-sm-6")) {
             console.log(container);
+
             const exerciseEquipmentVariantContainer =
               container.querySelectorAll(".col-sm-6 > ul > li");
+
             exerciseEquipmentVariantContainer.forEach((li) => {
               const li_children = li.childNodes;
-              console.log(li_children);
               let textValueIndex = -1;
+              let currChild = undefined;
               do {
                 textValueIndex++;
                 currChild = li_children[textValueIndex];
-                if (!currChild) {
-                  console.log(`unsupported container at ${li.textContent}`);
-                  return;
-                }
-              } while (currChild.nodeName != "#text" && currChild);
+              } while (currChild.nodeName != "#text");
 
               const listStartIndex = textValueIndex + 1;
               const typeName = li_children[textValueIndex].textContent;
@@ -89,16 +94,8 @@ const fs = require("fs");
               const exNamesContainer = li_children[
                 listStartIndex
               ].querySelectorAll(".col-sm-6 > ul > li > ul > li");
-              // console.log(exNamesContainer);
               exNamesContainer.forEach((e) => {
-                //Check if variant even exists
-                //Currently Not supported WIP
-
-                // THIS IS JUST HERE BECAUSE EXRX FRONTEND DEVS ARE INCONSITENT
-                // SOMETIMES STUFF ISNT NESTED NICELY
-                // if ((e.childNodes[0].nodeName = "#text")) href = null;
                 const cycleChildrenForHref = (node) => {
-                  console.log("looking for href", node);
                   if (node.hasChildNodes() == false) return null;
 
                   if (node.childNodes[0].nodeName != "A") {
@@ -119,10 +116,10 @@ const fs = require("fs");
                   href: cycleChildrenForHref(e) || null,
                 });
               });
-              excerciseTypeMap.set(typeName, excNames);
+              exerciseTypeMap.set(typeName, excNames);
             });
             Muscles.push("");
-            MuscleMap.set(Muscles[index - 1].name, excerciseTypeMap);
+            MuscleMap.set(Muscles[index - 1].name, exerciseTypeMap);
           } else {
             //dealing with banner
             //names with & not supported WIP
@@ -132,8 +129,10 @@ const fs = require("fs");
             let name = "";
             muscle.forEach((item) => {
               if (name == "") {
+                //ts-expect-error
                 name = item.innerText;
               } else {
+                //ts-expect-error
                 name = name + " & " + item.innerText;
               }
             });
@@ -141,25 +140,25 @@ const fs = require("fs");
           }
         });
         function stringifyMap(myMap) {
-          function selfIterator(map) {
-            return Array.from(map).reduce((acc, [key, value]) => {
-              if (value instanceof Map) {
-                acc[key] = selfIterator(value);
-              } else {
-                acc[key] = value;
-              }
-              return acc;
-            }, {});
-          }
-          const res = selfIterator(myMap);
-          console.log(res);
-          return res;
+          return;
+          // function selfIterator(map) {
+          //   //ts-expect-error
+          //   return Array.from(map).reduce((acc, [key, value]) => {
+          //     if (value instanceof Map) {
+          //       acc[key] = selfIterator(value);
+          //     } else {
+          //       acc[key] = value;
+          //     }
+          //     return acc;
+          //   }, {});
+          // }
+          // const res = selfIterator(myMap);
+          // console.log(res);
+          // return res;
         }
-        // debugger;
         console.log(MuscleMap);
         return stringifyMap(MuscleMap);
       });
-      // debugger;
       muscleGroups[i].muscles = muscleGroupData;
       console.log(muscleGroups[i].name + " is okay");
       finalData.push(muscleGroups[i]);
@@ -167,22 +166,4 @@ const fs = require("fs");
   } catch (e) {
     console.log(e);
   }
-  var jsonContent = JSON.stringify(finalData);
-  writeFile(jsonContent);
 })();
-
-const writeFile = (jsonContent) => {
-  fs.writeFile(
-    `${process.cwd()}\\output_${Number(new Date())}.json`,
-    jsonContent,
-    { encoding: "utf8", flag: "a" },
-    function (err) {
-      if (err) {
-        console.log("An error occured while writing JSON Object to File.");
-        return console.log(err);
-      }
-
-      console.log("JSON file has been saved.");
-    }
-  );
-};
