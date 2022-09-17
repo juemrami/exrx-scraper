@@ -94,6 +94,8 @@ export const withExercises = async (body_part_url: string) => {
 
 
     const res = await fetch(body_part_url, {
+        window: null,
+        keepalive: true,
         method: 'GET',
         redirect: 'follow'
     })
@@ -111,7 +113,10 @@ export const withExercises = async (body_part_url: string) => {
     // html.body?.pipeTo(fs.createWriteStream("test.html"))
     console.log(body_part_url);
     if (body_part_url === "https://exrx.net/Lists/ExList/ForeArmWt") {
-        await fs.writeFileSync("exrx.html", root.toString())
+        await fs.writeFileSync("exrx.html", html);
+
+        console.log('headrs', res.headers);
+
         debugger;
     }
     muscle_headers.forEach(header => {
