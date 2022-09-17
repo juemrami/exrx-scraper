@@ -30,7 +30,7 @@ import * as fs from "fs";
         ".col-sm-6 > ul > li"
       );
 
-      const data = [];
+      const data = [] as any;
       for (let i = 0; i < muscleGroupDomElements.length; i++) {
         const element = subMuscleDomElements[i] as HTMLAnchorElement;
         let muscleArray = element.innerText.split("\n");
@@ -41,7 +41,7 @@ import * as fs from "fs";
         data.push({
           name: element.innerText,
           href: element.href,
-          muscles: new Object(),
+          muscles: {} as any,
         });
       }
       return data;
