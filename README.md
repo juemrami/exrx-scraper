@@ -1,13 +1,19 @@
 # exrx-scraper
+
 This is a scraper for the exercises directory of Exrx.net.
-It is made using puppeteer(a headless chromium browser) ontop of javascript. 
+It is made using puppeteer(a headless chromium browser) ontop of javascript.
+
+## Requirements
+
+- Node v18
+- run npm install
 
 ## about
 
 The original that this was forked from was incomplete (would not pull deeper than the name of the muscle groups), this is my work on completing it.
 
-- Run using `node index` **not permanent**
-- This will create a json with exercises of Exrx.net
+- Run using `npm run main`
+- This will create a data.json with exercises of Exrx.net
 
 ### Todo
 

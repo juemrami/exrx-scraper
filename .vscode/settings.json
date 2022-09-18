@@ -10,8 +10,17 @@
     "**/.classpath": true,
     "**/.project": true,
     "**/.settings": true,
-    "**/.factorypath": true
+    "**/.factorypath": true,
+    "test.js": true,
+    "node_modules": true
   },
-  "hide-files.files": ["test.js"],
-  "cSpell.words": ["Exrx", "Popliteus", "Supraspinatus"]
+  "hide-files.files": [
+    "test.js",
+    "node_modules"
+  ],
+  "cSpell.words": [
+    "Exrx",
+    "Popliteus",
+    "Supraspinatus"
+  ]
 }

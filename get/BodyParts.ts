@@ -2,12 +2,13 @@
 import puppeteer from 'puppeteer';
 
 // import axios
-type data = {
+type BodyParts = {
     name: string,
     href: string,
+    muscles?: any[]
 }
 export const getBodyParts = async () => {
-    let data: data[] = [];
+    let data: BodyParts[] = [];
     let dir_url = "https://exrx.net/Lists/Directory";
 
     // let res = await fetch("https://exrx.net/Lists/Directory")
@@ -19,7 +20,7 @@ export const getBodyParts = async () => {
     console.log("getting body parts and links");
     let bodypart_list_items = await page.$$eval(".row > .col-sm-6 > ul > li",
         (items) => {
-            data = [] as data[];
+            data = [] as BodyParts[];
             items.map(li => {
                 let anchor = li.querySelector("a");
                 if (!anchor) {

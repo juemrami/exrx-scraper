@@ -2,24 +2,24 @@ import puppeteer from 'puppeteer';
 import { parse } from 'node-html-parser';
 import path from 'path';
 import fs from 'fs';
-import axios from 'axios';
-
+import { load } from 'cheerio';
 type _ = {
     name: string,
     links: [name: string, href: string][]
     exercises: any[]
 }
-type x = {
+type ExrxMuscle = {
     name: string,
     links: [name: string, href: string][]
-    exercises: string
+    exercisesHTML: string
+    exercises?: any[]
 }
 export const getMuscles = async (body_part_url: string) => {
     let browser = await puppeteer.launch();
     let page = await browser.newPage();
     console.log(body_part_url);
     await page.goto(body_part_url);
-    console.log("getting muscles and links");
+    // console.log("getting muscles and links");
     let muscle_headers = await page.$$eval(".col-sm-12 > h2", (headers) => {
         let exceptions = [
             "General Back"
@@ -50,7 +50,7 @@ export const getMuscles = async (body_part_url: string) => {
         })
     });
 
-    console.dir(muscle_headers, { depth: null });
+    // console.dir(muscle_headers, { depth: null });
     browser.close();
     return muscle_headers
 }
@@ -91,34 +91,23 @@ export const alt_method = async (body_part_url: string) => {
 }
 export const withExercises = async (body_part_url: string) => {
     // using chrome desktop user agent with js enabled
-
-
     const res = await fetch(body_part_url, {
-        window: null,
-        keepalive: true,
         method: 'GET',
         redirect: 'follow'
     })
-
-
-
-    // let { data: html, } = await axios.get(body_part_url, { responseType: "text" })
     const html = await res.text();
-    const root = parse(html);
+    // const root = parse(html);
+    const root = parse(load(html).html());
     let muscle_headers = root.querySelectorAll(".col-sm-12 > h2");
-    let data = [] as x[];
+    let data = [] as ExrxMuscle[];
     let exceptions = [
         "General Back"
     ]
-    // html.body?.pipeTo(fs.createWriteStream("test.html"))
     console.log(body_part_url);
-    if (body_part_url === "https://exrx.net/Lists/ExList/ForeArmWt") {
-        await fs.writeFileSync("exrx.html", html);
-
-        console.log('headrs', res.headers);
-
-        debugger;
-    }
+    // if (body_part_url === "https://exrx.net/Lists/ExList/ForeArmWt") {
+    //     fs.writeFileSync("_test.html", html);
+    //     debugger;
+    // }
     muscle_headers.forEach(header => {
         let name = header.textContent;
         let links = [] as [name: string, href: string][];
@@ -127,10 +116,11 @@ export const withExercises = async (body_part_url: string) => {
             let href = anchor.attributes.href;
             let name = anchor.text;
             // hack for empty A tags used in headers by EXRX
+            (!href || href.includes("http")) || (href = new URL("../" + href, body_part_url).href);
             if (href && name) {
                 links.push([
                     name,
-                    path.posix.join(body_part_url, "../", href).toString()
+                    href
                 ])
             }
         });
@@ -140,7 +130,7 @@ export const withExercises = async (body_part_url: string) => {
         data.push({
             name,
             links,
-            exercises: '',
+            exercisesHTML: '',
         })
 
     })
@@ -150,6 +140,8 @@ export const withExercises = async (body_part_url: string) => {
         let header = container_divs[i].querySelector("h2");
         if (header) {
             let name = header.textContent;
+            // console.log(name)
+            // if (name === "Wrist Flexors") debugger;
             i++;
             let exercise_html = container_divs[i].toString();
             // insert into data where name matches
@@ -160,8 +152,8 @@ export const withExercises = async (body_part_url: string) => {
             if (!exercise_html) {
                 throw "could not find exercise html for " + name;
             }
-            data[index].exercises = exercise_html;
-            // fs.writeFileSync(`./test/container_divs_${name}.html`, header.toString() + exercise_html);
+            data[index].exercisesHTML = exercise_html;
+            // fs.writeFileSync(`./test/container_divs_${name.replace(" ", '_')}.html`, header.toString() + exercise_html);
         }
     };
     // console.log(data);
