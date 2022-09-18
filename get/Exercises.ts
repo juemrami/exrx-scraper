@@ -1,12 +1,9 @@
 import { load } from "cheerio";
-import fs from "node:fs";
 import parse from "node-html-parser";
 import { HTMLElement } from "node-html-parser";
 import { question } from "readline-sync";
-import path from "path";
-import { fileURLToPath, URL } from "node:url";
+import { URL } from "node:url";
 import * as readlineSync from "readline-sync";
-import { html } from "cheerio/lib/api/manipulation";
 
 
 type ExerciseExercise = {

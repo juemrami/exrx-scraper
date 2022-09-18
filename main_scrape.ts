@@ -1,13 +1,13 @@
 import fs from 'fs';
 import { getBodyParts } from "./get/BodyParts";
 import { getExercises, ExrxEquipment } from "./get/Exercises";
-import { getMuscles, alt_method, withExercises } from "./get/Muscles";
+import { getMusclesWithExerciseHtml } from "./get/Muscles";
 import * as readlineSync from "readline-sync";
 (async () => {
     let bodyParts = await getBodyParts();
     bodyParts = bodyParts.filter((bodyPart) => bodyPart.name != "Olympic-style Weightlifts")
     for await (let bodyPart of bodyParts) {
-        let muscles = await withExercises(bodyPart.href);
+        let muscles = await getMusclesWithExerciseHtml(bodyPart.href);
         // console.dir(muscles, { depth: null });
 
         // if (bodyPart.name === "Forearms") debugger;
